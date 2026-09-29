@@ -5,6 +5,20 @@ Use a **clean, colorful 2D storybook/vector style** with chunky silhouettes, rou
 
 Space backgrounds may be dark, but playable objects should remain bright and readable.
 
+## Current Moon Demo Style
+The first playable art pass is **cute, minimal vector art with a small palette**. Keep shapes flat, outlines rounded, and faces simple enough to read at small sizes. Prefer authored SVG assets for characters and objects so they stay crisp and easy to revise.
+
+Palette for the current Moon demo:
+- Deep navy `#182b44` — space and dark UI ground.
+- Ink `#26394f` — outlines and UI panels.
+- Warm cream `#fff5dc` — Buddy, rocket, text and stars.
+- Lunar blue grey `#d8e0df`, `#bfd0d1`, `#9ebcc1` — terrain layers and shadows.
+- Teal `#73c6c7` — scanner, glass and discovery feedback.
+- Cheese yellow `#f9cb65` — cheese and the main action accent.
+- Soft coral `#ee8978` — small rocket and character accents.
+
+Use these roles consistently. Destination art may shift the terrain colors while preserving the ink, cream, and interaction accents. Important objects need distinct silhouettes and a text or shape cue as well as color.
+
 ## Shape Language
 - Rocket Buddies: rounded, friendly forms.
 - Meeps: soft blobs, bells and curves.

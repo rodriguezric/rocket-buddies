@@ -24,4 +24,4 @@ godot --headless --path . --script res://tests/test_moon_exploration.gd
 - Keep authored content separate from runtime state as the game grows.
 - Add a focused test when introducing a rule or integration contract.
 
-The current art is drawn with simple shapes as a temporary gameplay prototype. The full design is in [`docs/`](docs/00_README.md).
+The Moon demo has a first pass of minimal SVG art and matching UI. Its palette and asset rules are in [`docs/02_VISUAL_DESIGN.md`](docs/02_VISUAL_DESIGN.md). The broader game design is in [`docs/`](docs/00_README.md).

@@ -48,7 +48,7 @@ func _physics_process(delta: float) -> void:
 		var next_position: Vector2 = world.buddy_position + movement * WALK_SPEED * delta
 		# Keep the Buddy on the compact playable Moon surface.
 		next_position.x = clampf(next_position.x, 28.0, 1252.0)
-		next_position.y = clampf(next_position.y, 330.0, 676.0)
+		next_position.y = clampf(next_position.y, 330.0, 530.0)
 		world.buddy_position = next_position
 		world.queue_redraw()
 	if _scan_time > 0.0:
@@ -96,10 +96,10 @@ func _nearest_target() -> String:
 
 func _update_prompt() -> void:
 	match _nearest_target():
-		"rocket": %PromptLabel.text = "E / A  Return to rocket"
-		"cheese": %PromptLabel.text = "E / A  Collect Moon Cheese"
-		"crater": %PromptLabel.text = "E / A  Inspect crater"
-		_: %PromptLabel.text = ""
+		"rocket": %PromptLabel.text = "E / A  •  Return to rocket"
+		"cheese": %PromptLabel.text = "E / A  •  Collect Moon Cheese"
+		"crater": %PromptLabel.text = "E / A  •  Inspect crater"
+		_: %PromptLabel.text = "Q / X  •  Scan for clues"
 
 
 func _scan() -> void:
@@ -144,9 +144,9 @@ func _interact() -> void:
 
 
 func _update_hud() -> void:
-	%ObjectiveLabel.text = "Moon Cheese: %s    Crater discovery: %s" % [
-		"found" if _cheese_collected else "missing",
-		"found" if _discovery_found else "missing"
+	%ObjectiveLabel.text = "%s MOON CHEESE     %s CRATER" % [
+		"[✓]" if _cheese_collected else "[ ]",
+		"[✓]" if _discovery_found else "[ ]"
 	]
 
 

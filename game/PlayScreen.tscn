@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://game/play_screen.gd" id="1"]
 [ext_resource type="Theme" path="res://ui/theme/base_theme.tres" id="2"]
+[ext_resource type="Texture2D" path="res://assets/art/moon/cheese.svg" id="3"]
 
 [node name="PlayScreen" type="Control"]
 layout_mode = 3
@@ -21,7 +22,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.055, 0.08, 0.1, 1)
+color = Color(0.094, 0.169, 0.267, 1)
 
 [node name="Center" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -43,12 +44,23 @@ alignment = 1
 [node name="Heading" type="Label" parent="Center/Panel/Content"]
 layout_mode = 2
 theme_type_variation = &"H1"
+theme_override_colors/font_color = Color(0.976, 0.796, 0.396, 1)
+theme_override_font_sizes/font_size = 36
 text = "DEMO LAUNCHER"
 horizontal_alignment = 1
 
+[node name="CheeseArt" type="TextureRect" parent="Center/Panel/Content"]
+custom_minimum_size = Vector2(90, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+texture = ExtResource("3")
+expand_mode = 1
+stretch_mode = 5
+
 [node name="Message" type="Label" parent="Center/Panel/Content"]
 layout_mode = 2
-text = "Developer demos. Each mode will be playable from here."
+text = "Pick a tiny adventure."
 horizontal_alignment = 1
 autowrap_mode = 2
 
