@@ -1,0 +1,90 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scenes/title/title_screen.gd" id="1"]
+[ext_resource type="Theme" path="res://ui/theme/base_theme.tres" id="2"]
+
+[node name="TitleScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2")
+script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.045, 0.075, 0.12, 1)
+
+[node name="SafeArea" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 48.0
+offset_top = 36.0
+offset_right = -48.0
+offset_bottom = -36.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Columns" type="HBoxContainer" parent="SafeArea"]
+layout_mode = 2
+theme_override_constants/separation = 48
+
+[node name="Identity" type="VBoxContainer" parent="SafeArea/Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="Title" type="Label" parent="SafeArea/Columns/Identity"]
+layout_mode = 2
+theme_type_variation = &"H1"
+text = "ROCKET BUDDIES"
+
+[node name="Tagline" type="Label" parent="SafeArea/Columns/Identity"]
+layout_mode = 2
+theme_type_variation = &"Muted"
+text = "A tiny adventure starts on the Moon."
+autowrap_mode = 2
+
+[node name="MenuPanel" type="PanelContainer" parent="SafeArea/Columns"]
+custom_minimum_size = Vector2(330, 0)
+layout_mode = 2
+
+[node name="Menu" type="VBoxContainer" parent="SafeArea/Columns/MenuPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="PlayButton" type="Button" parent="SafeArea/Columns/MenuPanel/Menu"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Play Demos"
+
+[node name="SettingsButton" type="Button" parent="SafeArea/Columns/MenuPanel/Menu"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Settings"
+
+[node name="RecordsButton" type="Button" parent="SafeArea/Columns/MenuPanel/Menu"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Records"
+
+[node name="AchievementsButton" type="Button" parent="SafeArea/Columns/MenuPanel/Menu"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Achievements"
+
+[node name="QuitButton" type="Button" parent="SafeArea/Columns/MenuPanel/Menu"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Quit"

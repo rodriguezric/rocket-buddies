@@ -1,0 +1,143 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scenes/settings/settings_screen.gd" id="1"]
+[ext_resource type="Theme" path="res://ui/theme/base_theme.tres" id="2"]
+
+[node name="SettingsScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2")
+script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.045, 0.065, 0.095, 1)
+
+[node name="SafeArea" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 48.0
+offset_top = 28.0
+offset_right = -48.0
+offset_bottom = -28.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="SafeArea"]
+layout_mode = 2
+
+[node name="Content" type="VBoxContainer" parent="SafeArea/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Heading" type="Label" parent="SafeArea/Panel/Content"]
+layout_mode = 2
+theme_type_variation = &"H1"
+text = "SETTINGS"
+
+[node name="ControlsHeading" type="Label" parent="SafeArea/Panel/Content"]
+layout_mode = 2
+text = "Controls"
+
+[node name="Bindings" type="Label" parent="SafeArea/Panel/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"Muted"
+
+[node name="AudioHeading" type="Label" parent="SafeArea/Panel/Content"]
+layout_mode = 2
+text = "Audio"
+
+[node name="MasterRow" type="HBoxContainer" parent="SafeArea/Panel/Content"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SafeArea/Panel/Content/MasterRow"]
+custom_minimum_size = Vector2(130, 0)
+layout_mode = 2
+text = "Master"
+
+[node name="MasterSlider" type="HSlider" parent="SafeArea/Panel/Content/MasterRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 100.0
+step = 1.0
+
+[node name="MusicRow" type="HBoxContainer" parent="SafeArea/Panel/Content"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SafeArea/Panel/Content/MusicRow"]
+custom_minimum_size = Vector2(130, 0)
+layout_mode = 2
+text = "Music"
+
+[node name="MusicSlider" type="HSlider" parent="SafeArea/Panel/Content/MusicRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 100.0
+step = 1.0
+
+[node name="SfxRow" type="HBoxContainer" parent="SafeArea/Panel/Content"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SafeArea/Panel/Content/SfxRow"]
+custom_minimum_size = Vector2(130, 0)
+layout_mode = 2
+text = "Sound effects"
+
+[node name="SfxSlider" type="HSlider" parent="SafeArea/Panel/Content/SfxRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 100.0
+step = 1.0
+
+[node name="ReducedMotion" type="CheckButton" parent="SafeArea/Panel/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Reduce decorative motion"
+
+[node name="Status" type="Label" parent="SafeArea/Panel/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"Muted"
+text = "Settings apply immediately and are saved locally."
+
+[node name="Actions" type="HBoxContainer" parent="SafeArea/Panel/Content"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BackButton" type="Button" parent="SafeArea/Panel/Content/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Back"
+
+[node name="ResetButton" type="Button" parent="SafeArea/Panel/Content/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Reset Settings"
+
+[node name="ClearDataButton" type="Button" parent="SafeArea/Panel/Content/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Clear All Stored Data"
+
+[node name="ClearConfirmation" type="ConfirmationDialog" parent="."]
+unique_name_in_owner = true
+title = "Clear all stored data?"
+dialog_text = "This deletes local settings, records, and achievement progress. This action cannot be undone."
+ok_button_text = "Clear All Data"
+cancel_button_text = "Cancel"

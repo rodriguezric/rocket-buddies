@@ -8,3 +8,5 @@ exports/
 *.translation
 export.cfg
 export_presets.cfg
+*.uid
+*.import

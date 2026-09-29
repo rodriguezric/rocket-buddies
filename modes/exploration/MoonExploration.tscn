@@ -1,0 +1,84 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://modes/exploration/moon_exploration.gd" id="1"]
+[ext_resource type="Script" path="res://modes/exploration/moon_world.gd" id="2"]
+[ext_resource type="Theme" path="res://ui/theme/base_theme.tres" id="3"]
+
+[node name="MoonExploration" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("3")
+script = ExtResource("1")
+
+[node name="World" type="Node2D" parent="."]
+script = ExtResource("2")
+
+[node name="HUD" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 18.0
+offset_right = -24.0
+offset_bottom = -18.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Column" type="VBoxContainer" parent="HUD"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Title" type="Label" parent="HUD/Column"]
+layout_mode = 2
+theme_type_variation = &"H1"
+text = "MOON EXPLORATION"
+
+[node name="ObjectiveLabel" type="Label" parent="HUD/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Find Moon Cheese and inspect the crater."
+
+[node name="HintLabel" type="Label" parent="HUD/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Move: WASD / arrows / stick   •   Scan: Q / X   •   Interact: E / A"
+
+[node name="Spacer" type="Control" parent="HUD/Column"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="PromptLabel" type="Label" parent="HUD/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"H1"
+theme_override_colors/font_outline_color = Color(0.08, 0.12, 0.2, 1)
+theme_override_constants/outline_size = 6
+text = ""
+
+[node name="FeedbackLabel" type="Label" parent="HUD/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0.08, 0.12, 0.2, 1)
+theme_override_constants/outline_size = 5
+text = "Scan to find something interesting."
+
+[node name="Footer" type="HBoxContainer" parent="HUD/Column"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="RestartButton" type="Button" parent="HUD/Column/Footer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Restart (R / Y)"
+
+[node name="ExitButton" type="Button" parent="HUD/Column/Footer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Demo Menu (Esc / B)"
