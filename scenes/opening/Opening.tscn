@@ -21,7 +21,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.035, 0.055, 0.09, 1)
+color = Color(0.094, 0.169, 0.267, 1)
 
 [node name="Center" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -40,13 +40,17 @@ theme_override_constants/separation = 14
 [node name="GameName" type="Label" parent="Center/Logo"]
 layout_mode = 2
 theme_type_variation = &"H1"
-text = "YOUR GAME"
+theme_override_colors/font_color = Color(0.976, 0.796, 0.396, 1)
+theme_override_font_sizes/font_size = 52
+text = "ROCKET BUDDIES"
 horizontal_alignment = 1
 
 [node name="Studio" type="Label" parent="Center/Logo"]
 layout_mode = 2
 theme_type_variation = &"Muted"
-text = "A reusable Godot foundation"
+theme_override_colors/font_color = Color(0.451, 0.776, 0.78, 1)
+theme_override_font_sizes/font_size = 22
+text = "A tiny adventure starts on the Moon."
 horizontal_alignment = 1
 
 [node name="SkipPrompt" type="Label" parent="."]

@@ -12,8 +12,8 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("2")
 script = ExtResource("1")
-heading = "ACHIEVEMENTS"
-empty_message = "No achievements yet. Progress will appear here as you play."
+heading = "ADVENTURE MILESTONES"
+empty_message = "No milestones yet. Your discoveries and rescues will add to your adventure story."
 data_kind = "achievements"
 
 [node name="Background" type="ColorRect" parent="."]
@@ -58,7 +58,7 @@ autowrap_mode = 2
 [node name="PopulatedMessage" type="Label" parent="Center/Panel/Content"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Achievement data is available. Replace this summary with the game's achievement presentation."
+text = "Milestones from your discoveries, rescues, and missions will appear here."
 horizontal_alignment = 1
 autowrap_mode = 2
 

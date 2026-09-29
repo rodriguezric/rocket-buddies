@@ -12,8 +12,8 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("2")
 script = ExtResource("1")
-heading = "RECORDS"
-empty_message = "No records yet. Play the game to create your first record."
+heading = "MISSION LOG"
+empty_message = "No missions recorded yet. Your completed space trips will show up here."
 data_kind = "records"
 
 [node name="Background" type="ColorRect" parent="."]
@@ -58,7 +58,7 @@ autowrap_mode = 2
 [node name="PopulatedMessage" type="Label" parent="Center/Panel/Content"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Record data is available. Replace this summary with the game's record presentation."
+text = "Mission results and discoveries from your trips will appear here."
 horizontal_alignment = 1
 autowrap_mode = 2
 
