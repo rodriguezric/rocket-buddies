@@ -4,6 +4,10 @@ signal mode_completed(result: ModeResult)
 
 const WALK_SPEED := 245.0
 const INTERACTION_RANGE := 92.0
+const BUDDY_START := Vector2(270, 405)
+const ROCKET_DOOR := Vector2(156, 415)
+enum Phase { ARRIVING, DISEMBARKING, PLAYING, BOARDING, SHAKING, LAUNCHING, FADING, FINISHED }
+const PHASE_NAMES: Array[StringName] = [&"arriving", &"disembarking", &"playing", &"boarding", &"shaking", &"launching", &"fading", &"finished"]
 
 @onready var world: Node2D = $World
 
@@ -14,6 +18,8 @@ var _meep_rescued := false
 var _discovery_found := false
 var _message_time := 0.0
 var _discovery_tween: Tween
+var _sequence_tween: Tween
+var phase := Phase.ARRIVING
 
 
 func _ready() -> void:
@@ -26,7 +32,7 @@ func _ready() -> void:
 		mode_context = ModeContext.new()
 		mode_context.mode_id = &"exploration"
 		mode_context.destination_id = &"moon"
-	_update_hud()
+	_restart()
 
 
 func present(context: Dictionary) -> void:
@@ -44,6 +50,8 @@ func _resize_world() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if phase != Phase.PLAYING:
+		return
 	var movement := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	var previous_position: Vector2 = world.buddy_position
 	if movement != Vector2.ZERO:
@@ -63,6 +71,8 @@ func _physics_process(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if phase != Phase.PLAYING:
+		return
 	if event.is_action_pressed("scan"):
 		_scan()
 	elif event.is_action_pressed("interact"):
@@ -114,6 +124,8 @@ func _update_prompt() -> void:
 
 
 func _scan() -> void:
+	if phase != Phase.PLAYING:
+		return
 	world.play_scan()
 	var clues: Array[String] = []
 	if not _cheese_collected:
@@ -136,6 +148,8 @@ func _direction_to(target: Vector2) -> String:
 
 
 func _interact() -> void:
+	if phase != Phase.PLAYING:
+		return
 	if world.is_meep_talking():
 		world.advance_meep_dialogue()
 		return
@@ -225,15 +239,22 @@ func _make_result(status: StringName) -> ModeResult:
 
 
 func _finish() -> void:
+	if phase != Phase.PLAYING:
+		return
 	var status: StringName = &"completed" if _cheese_collected and _discovery_found and _meep_rescued else &"incomplete"
-	_emit_result(_make_result(status))
+	_start_departure(_make_result(status))
 
 
 func _exit_demo() -> void:
+	if phase != Phase.PLAYING:
+		return
 	_emit_result(_make_result(&"cancelled"))
 
 
 func _emit_result(result: ModeResult) -> void:
+	if phase == Phase.FINISHED:
+		return
+	_set_phase(Phase.FINISHED)
 	if mode_completed.get_connections().is_empty():
 		print("Moon demo result: ", result.status, " ", result.rewards, " ", result.discoveries)
 		get_tree().quit()
@@ -242,13 +263,17 @@ func _emit_result(result: ModeResult) -> void:
 
 
 func _restart() -> void:
+	if _sequence_tween != null:
+		_sequence_tween.kill()
 	_hide_discovery_card()
 	_cheese_collected = false
 	_cheese_available = false
 	_meep_rescued = false
 	_discovery_found = false
 	_message_time = 0.0
-	world.buddy_position = Vector2(270, 405)
+	world.buddy_position = BUDDY_START
+	world.buddy_facing = Vector2.RIGHT
+	world.buddy_draw_scale = 1.0
 	world.reset_walk_animation()
 	world.reset_pickup_effect()
 	world.reset_meep()
@@ -258,3 +283,60 @@ func _restart() -> void:
 	world.queue_redraw()
 	%FeedbackLabel.text = "Scan to find something interesting."
 	_update_hud()
+	%DepartureFade.color.a = 0.0
+	_start_arrival()
+
+
+func _set_phase(next_phase: Phase) -> void:
+	phase = next_phase
+	world.stage_sequence(PHASE_NAMES[phase])
+	$HUD.visible = phase == Phase.PLAYING
+	%RestartButton.disabled = phase != Phase.PLAYING
+	%ExitButton.disabled = phase != Phase.PLAYING
+
+
+func _start_arrival() -> void:
+	_set_phase(Phase.ARRIVING)
+	world.buddy_visible = false
+	world.rocket_position = Vector2(world.ROCKET.x, -220)
+	var reduced := SaveService.is_reduced_motion()
+	_sequence_tween = create_tween()
+	_sequence_tween.tween_property(world, "rocket_position", world.ROCKET, 0.01 if reduced else 1.6).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_sequence_tween.tween_callback(func() -> void: _set_phase(Phase.DISEMBARKING))
+	_sequence_tween.tween_interval(0.2)
+	_sequence_tween.tween_callback(func() -> void:
+		world.buddy_position = ROCKET_DOOR
+		world.buddy_draw_scale = 0.55
+		world.buddy_visible = true
+	)
+	_sequence_tween.tween_method(world.move_buddy, ROCKET_DOOR, BUDDY_START, 0.01 if reduced else 0.7)
+	_sequence_tween.parallel().tween_property(world, "buddy_draw_scale", 1.0, 0.01 if reduced else 0.7)
+	_sequence_tween.tween_callback(func() -> void:
+		world.reset_walk_animation()
+		_set_phase(Phase.PLAYING)
+		_update_prompt()
+	)
+
+
+func _start_departure(result: ModeResult) -> void:
+	_hide_discovery_card()
+	world.close_meep_dialogue()
+	_set_phase(Phase.BOARDING)
+	world.reset_walk_animation()
+	world.buddy_facing = Vector2.LEFT
+	var reduced := SaveService.is_reduced_motion()
+	var boarding_time := 0.01 if reduced else clampf(world.buddy_position.distance_to(ROCKET_DOOR) / WALK_SPEED, 0.35, 0.8)
+	_sequence_tween = create_tween()
+	_sequence_tween.tween_method(world.move_buddy, world.buddy_position, ROCKET_DOOR, boarding_time)
+	_sequence_tween.parallel().tween_property(world, "buddy_draw_scale", 0.55, boarding_time)
+	_sequence_tween.tween_callback(func() -> void:
+		world.buddy_visible = false
+		_set_phase(Phase.SHAKING)
+	)
+	_sequence_tween.tween_interval(0.4 if reduced else 1.1)
+	_sequence_tween.tween_callback(func() -> void: _set_phase(Phase.LAUNCHING))
+	_sequence_tween.tween_property(world, "rocket_position", Vector2(world.ROCKET.x, -220), 0.01 if reduced else 1.6).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	_sequence_tween.tween_callback(func() -> void: _set_phase(Phase.FADING))
+	_sequence_tween.tween_interval(0.25)
+	_sequence_tween.tween_property(%DepartureFade, "color:a", 1.0, 0.2 if reduced else 0.5)
+	_sequence_tween.tween_callback(func() -> void: _emit_result(result))

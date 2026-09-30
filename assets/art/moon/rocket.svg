@@ -1,5 +1,4 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="160" height="220" viewBox="0 0 160 220">
-  <ellipse cx="80" cy="206" rx="68" ry="11" fill="#9ebcc1"/>
   <g stroke="#26394f" stroke-width="5" stroke-linejoin="round">
     <path d="M44 142 15 189l37-10 20-41m44 4 29 47-37-10-20-41" fill="#ee8978"/>
     <path d="M80 12C48 40 40 80 40 140l14 49h52l14-49c0-60-8-100-40-128Z" fill="#fff5dc"/>

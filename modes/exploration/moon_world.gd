@@ -7,6 +7,7 @@ const CHEESE_ART: Texture2D = preload("res://assets/art/moon/cheese.svg")
 const CRATER_ART: Texture2D = preload("res://assets/art/moon/crater.svg")
 const MEEP_ART: Texture2D = preload("res://assets/art/moon/meep.svg")
 const HAPPY_MEEP_ART: Texture2D = preload("res://assets/art/moon/meep_happy.svg")
+const SURPRISED_MEEP_ART: Texture2D = preload("res://assets/art/moon/meep_surprised.svg")
 const SPEECH_BUBBLE: PackedScene = preload("res://ui/components/MeepSpeechBubble.tscn")
 
 const ROCKET := Vector2(156, 382)
@@ -22,6 +23,11 @@ const SCAN_EFFECT_DURATION := 1.8
 
 var buddy_position := Vector2(270, 405)
 var buddy_facing := Vector2.RIGHT
+var buddy_visible := true
+var buddy_draw_scale := 1.0
+var rocket_position := ROCKET
+var cinematic_state: StringName = &"playing"
+var _cinematic_time := 0.0
 var cheese_collected := false
 var discovery_found := false
 var meep_rescued := false
@@ -105,6 +111,9 @@ func reset_pickup_effect() -> void:
 
 
 func _process(delta: float) -> void:
+	if cinematic_state != &"playing":
+		_cinematic_time += delta
+		queue_redraw()
 	_update_meep_walk(delta)
 	if _meep_celebration > 0.0 and not is_meep_talking():
 		_meep_celebration = maxf(0.0, _meep_celebration - delta)
@@ -118,7 +127,7 @@ func _process(delta: float) -> void:
 
 
 func _update_meep_walk(delta: float) -> void:
-	if is_meep_talking() or _meep_celebration > 0.0:
+	if cinematic_state != &"playing" or is_meep_talking() or _meep_celebration > 0.0:
 		return
 	# Stay near the Buddy when approached so interaction remains easy.
 	if buddy_position.distance_to(meep_position) < 115.0:
@@ -156,9 +165,22 @@ func reset_walk_animation() -> void:
 	queue_redraw()
 
 
+func stage_sequence(stage: StringName) -> void:
+	cinematic_state = stage
+	_cinematic_time = 0.0
+	queue_redraw()
+
+
+func move_buddy(position_value: Vector2) -> void:
+	var distance := buddy_position.distance_to(position_value)
+	buddy_position = position_value
+	update_walk_animation(distance, get_process_delta_time(), SaveService.is_reduced_motion())
+	queue_redraw()
+
+
 func _draw() -> void:
 	draw_texture_rect(BACKGROUND, Rect2(0, 0, 1280, 720), false)
-	draw_texture_rect(ROCKET_ART, Rect2(ROCKET + Vector2(-80, -130), Vector2(160, 220)), false)
+	_draw_rocket()
 	draw_texture_rect(CRATER_ART, Rect2(DISCOVERY + Vector2(-65, -50), Vector2(130, 100)), false)
 	if not cheese_collected:
 		draw_texture_rect(CHEESE_ART, Rect2(CHEESE + Vector2(-45, -40), Vector2(90, 80)), false)
@@ -169,12 +191,31 @@ func _draw() -> void:
 		draw_line(DISCOVERY + Vector2(48, -31), DISCOVERY + Vector2(56, -43), Color("26394f"), 3.0)
 	if _scan_time > 0.0:
 		_draw_scan_effect()
-	_draw_oval_shadow(buddy_position + Vector2(0, 22), Vector2(28 - _walk_lift * 0.5, 8), Color("9ebcc1"))
-	draw_set_transform(buddy_position + Vector2(0, -24 - _walk_lift), 0.0, Vector2(-1.0 if buddy_facing.x < -0.15 else 1.0, 1.0))
-	draw_texture_rect(BUDDY, Rect2(-48, -56, 96, 112), false)
-	draw_set_transform(Vector2.ZERO)
+	if buddy_visible:
+		_draw_oval_shadow(buddy_position + Vector2(0, 22), Vector2(28 - _walk_lift * 0.5, 8) * buddy_draw_scale, Color("9ebcc1"))
+		draw_set_transform(buddy_position + Vector2(0, -24 - _walk_lift), 0.0, Vector2(-1.0 if buddy_facing.x < -0.15 else 1.0, 1.0) * buddy_draw_scale)
+		draw_texture_rect(BUDDY, Rect2(-48, -56, 96, 112), false)
+		draw_set_transform(Vector2.ZERO)
 	if _pickup_time > 0.0:
 		_draw_pickup_effect()
+
+
+func _draw_rocket() -> void:
+	var shadow_scale := clampf(1.0 - absf(rocket_position.y - ROCKET.y) / 450.0, 0.0, 1.0)
+	if shadow_scale > 0.0:
+		_draw_oval_shadow(ROCKET + Vector2(0, 76), Vector2(68, 11) * shadow_scale, Color("9ebcc1"))
+	var shake := Vector2.ZERO
+	var tilt := 0.0
+	if cinematic_state == &"shaking" and not SaveService.is_reduced_motion():
+		shake.x = sin(_cinematic_time * 65.0) * 3.0
+		tilt = sin(_cinematic_time * 48.0) * 0.025
+	draw_set_transform(rocket_position + shake, tilt)
+	if cinematic_state == &"arriving" or cinematic_state == &"launching":
+		var flame_length := 58.0 if SaveService.is_reduced_motion() else 58.0 + sin(_cinematic_time * 22.0) * 8.0
+		draw_colored_polygon(PackedVector2Array([Vector2(-19, 58), Vector2(0, 58 + flame_length), Vector2(19, 58)]), Color("f9cb65"))
+		draw_colored_polygon(PackedVector2Array([Vector2(-10, 58), Vector2(0, 87), Vector2(10, 58)]), Color("fff5dc"))
+	draw_texture_rect(ROCKET_ART, Rect2(-80, -130, 160, 220), false)
+	draw_set_transform(Vector2.ZERO)
 
 
 func _draw_scan_effect() -> void:
@@ -203,11 +244,21 @@ func _draw_scan_effect() -> void:
 
 func _draw_meep() -> void:
 	var lift := 0.0
-	if _meep_celebration > 0.0 and not is_meep_talking() and not SaveService.is_reduced_motion():
+	var cheering := cinematic_state == &"launching" or cinematic_state == &"fading"
+	if cheering and not SaveService.is_reduced_motion():
+		lift = absf(sin(_cinematic_time * PI * 3.0)) * 14.0
+	elif _meep_celebration > 0.0 and not is_meep_talking() and not SaveService.is_reduced_motion():
 		lift = absf(sin((2.0 - _meep_celebration) * PI * 3.0)) * 9.0
 	_draw_oval_shadow(meep_position + Vector2(0, 36), Vector2(31, 8), Color("9ebcc1"))
-	draw_texture_rect(HAPPY_MEEP_ART if meep_rescued else MEEP_ART, Rect2(meep_position + Vector2(-50, -65 - lift), Vector2(100, 110)), false)
-	if not is_meep_talking():
+	var texture := HAPPY_MEEP_ART if meep_rescued or cheering else MEEP_ART
+	if cinematic_state == &"shaking":
+		texture = SURPRISED_MEEP_ART
+	draw_texture_rect(texture, Rect2(meep_position + Vector2(-50, -65 - lift), Vector2(100, 110)), false)
+	if cinematic_state == &"shaking":
+		_draw_meep_text("!", meep_position + Vector2(-4, -80), Color("f9cb65"))
+	elif cheering:
+		_draw_meep_text("MEEP!", meep_position + Vector2(-32, -86 - lift), Color("fff5dc"))
+	elif not is_meep_talking():
 		if _meep_celebration > 0.0:
 			_draw_meep_text("♥", meep_position + Vector2(-10, -80), Color("ee8978", minf(_meep_celebration / 0.4, 1.0)))
 		elif not meep_rescued:
