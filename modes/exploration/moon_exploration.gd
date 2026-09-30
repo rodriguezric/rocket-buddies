@@ -43,6 +43,7 @@ func _resize_world() -> void:
 
 func _physics_process(delta: float) -> void:
 	var movement := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	var previous_position: Vector2 = world.buddy_position
 	if movement != Vector2.ZERO:
 		world.buddy_facing = movement
 		var next_position: Vector2 = world.buddy_position + movement * WALK_SPEED * delta
@@ -51,6 +52,7 @@ func _physics_process(delta: float) -> void:
 		next_position.y = clampf(next_position.y, 330.0, 530.0)
 		world.buddy_position = next_position
 		world.queue_redraw()
+	world.update_walk_animation(previous_position.distance_to(world.buddy_position), delta, SaveService.is_reduced_motion())
 	if _scan_time > 0.0:
 		_scan_time = maxf(0.0, _scan_time - delta)
 		world.scan_radius = (SCAN_DURATION - _scan_time) / SCAN_DURATION * 300.0 if _scan_time > 0.0 else 0.0
@@ -191,6 +193,7 @@ func _restart() -> void:
 	_scan_time = 0.0
 	_message_time = 0.0
 	world.buddy_position = Vector2(270, 405)
+	world.reset_walk_animation()
 	world.cheese_collected = false
 	world.discovery_found = false
 	world.scan_radius = 0.0

@@ -9,12 +9,38 @@ const CRATER_ART: Texture2D = preload("res://assets/art/moon/crater.svg")
 const ROCKET := Vector2(156, 382)
 const CHEESE := Vector2(735, 470)
 const DISCOVERY := Vector2(1000, 265)
+const WALK_BOUNCE_HEIGHT := 5.0
+const WALK_BOUNCE_DISTANCE := 100.0
 
 var buddy_position := Vector2(270, 405)
 var buddy_facing := Vector2.RIGHT
 var cheese_collected := false
 var discovery_found := false
 var scan_radius := 0.0
+var _walk_distance := 0.0
+var _walk_lift := 0.0
+
+
+func update_walk_animation(distance: float, delta: float, reduced_motion: bool) -> void:
+	var previous_lift := _walk_lift
+	if reduced_motion:
+		_walk_distance = 0.0
+		_walk_lift = 0.0
+	elif distance > 0.0:
+		_walk_distance = fmod(_walk_distance + distance, WALK_BOUNCE_DISTANCE)
+		_walk_lift = (1.0 - cos(_walk_distance / WALK_BOUNCE_DISTANCE * TAU)) * WALK_BOUNCE_HEIGHT * 0.5
+	else:
+		_walk_lift = move_toward(_walk_lift, 0.0, delta * 40.0)
+		if is_zero_approx(_walk_lift):
+			_walk_distance = 0.0
+	if not is_equal_approx(previous_lift, _walk_lift):
+		queue_redraw()
+
+
+func reset_walk_animation() -> void:
+	_walk_distance = 0.0
+	_walk_lift = 0.0
+	queue_redraw()
 
 
 func _draw() -> void:
@@ -33,8 +59,8 @@ func _draw() -> void:
 			draw_arc(CHEESE, 46.0, 0.0, TAU, 32, Color("73c6c7"), 4.0)
 		if not discovery_found and buddy_position.distance_to(DISCOVERY) <= 300.0:
 			draw_arc(DISCOVERY, 66.0, 0.0, TAU, 32, Color("73c6c7"), 4.0)
-	_draw_oval_shadow(buddy_position + Vector2(0, 22), Vector2(28, 8), Color("9ebcc1"))
-	draw_set_transform(buddy_position + Vector2(0, -24), 0.0, Vector2(-1.0 if buddy_facing.x < -0.15 else 1.0, 1.0))
+	_draw_oval_shadow(buddy_position + Vector2(0, 22), Vector2(28 - _walk_lift * 0.5, 8), Color("9ebcc1"))
+	draw_set_transform(buddy_position + Vector2(0, -24 - _walk_lift), 0.0, Vector2(-1.0 if buddy_facing.x < -0.15 else 1.0, 1.0))
 	draw_texture_rect(BUDDY, Rect2(-48, -56, 96, 112), false)
 	draw_set_transform(Vector2.ZERO)
 
