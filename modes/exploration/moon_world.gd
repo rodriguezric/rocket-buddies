@@ -11,6 +11,7 @@ const CHEESE := Vector2(735, 470)
 const DISCOVERY := Vector2(1000, 265)
 const WALK_BOUNCE_HEIGHT := 5.0
 const WALK_BOUNCE_DISTANCE := 100.0
+const PICKUP_DURATION := 0.9
 
 var buddy_position := Vector2(270, 405)
 var buddy_facing := Vector2.RIGHT
@@ -19,6 +20,23 @@ var discovery_found := false
 var scan_radius := 0.0
 var _walk_distance := 0.0
 var _walk_lift := 0.0
+var _pickup_time := 0.0
+
+
+func play_cheese_pickup() -> void:
+	_pickup_time = PICKUP_DURATION
+	queue_redraw()
+
+
+func reset_pickup_effect() -> void:
+	_pickup_time = 0.0
+	queue_redraw()
+
+
+func _process(delta: float) -> void:
+	if _pickup_time > 0.0:
+		_pickup_time = maxf(0.0, _pickup_time - delta)
+		queue_redraw()
 
 
 func update_walk_animation(distance: float, delta: float, reduced_motion: bool) -> void:
@@ -63,6 +81,28 @@ func _draw() -> void:
 	draw_set_transform(buddy_position + Vector2(0, -24 - _walk_lift), 0.0, Vector2(-1.0 if buddy_facing.x < -0.15 else 1.0, 1.0))
 	draw_texture_rect(BUDDY, Rect2(-48, -56, 96, 112), false)
 	draw_set_transform(Vector2.ZERO)
+	if _pickup_time > 0.0:
+		_draw_pickup_effect()
+
+
+func _draw_pickup_effect() -> void:
+	var progress := 1.0 - _pickup_time / PICKUP_DURATION
+	var fade := minf(1.0, _pickup_time / 0.3)
+	var reduced_motion := SaveService.is_reduced_motion()
+	if not reduced_motion:
+		var spread := 12.0 + (1.0 - pow(1.0 - progress, 3.0)) * 46.0
+		for index in range(6):
+			var angle := float(index) / 6.0 * TAU - PI * 0.5
+			var center := CHEESE + Vector2.from_angle(angle) * spread
+			var points := PackedVector2Array()
+			for corner in range(8):
+				var radius := 7.0 if corner % 2 == 0 else 2.5
+				points.append(center + Vector2.from_angle(float(corner) / 8.0 * TAU) * radius)
+			draw_colored_polygon(points, Color("f9cb65", fade))
+	var rise := 0.0 if reduced_motion else progress * 30.0
+	var text_position := CHEESE + Vector2(-18, -40 - rise)
+	draw_string_outline(ThemeDB.fallback_font, text_position, "+1", HORIZONTAL_ALIGNMENT_LEFT, -1, 28, 5, Color("26394f", fade))
+	draw_string(ThemeDB.fallback_font, text_position, "+1", HORIZONTAL_ALIGNMENT_LEFT, -1, 28, Color("f9cb65", fade))
 
 
 func _draw_oval_shadow(center: Vector2, radii: Vector2, color: Color) -> void:

@@ -131,7 +131,7 @@ func _interact() -> void:
 		"cheese":
 			_cheese_collected = true
 			world.cheese_collected = true
-			world.queue_redraw()
+			world.play_cheese_pickup()
 			_show_message("Moon Cheese collected! It smells mysteriously delicious.", 4.0)
 		"crater":
 			_discovery_found = true
@@ -194,6 +194,7 @@ func _restart() -> void:
 	_message_time = 0.0
 	world.buddy_position = Vector2(270, 405)
 	world.reset_walk_animation()
+	world.reset_pickup_effect()
 	world.cheese_collected = false
 	world.discovery_found = false
 	world.scan_radius = 0.0
