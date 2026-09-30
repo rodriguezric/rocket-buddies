@@ -10,6 +10,8 @@ On the Moon, move with WASD, arrow keys, or the left stick. Scan with Q or contr
 
 The Meep occasionally strolls around its area and stops when approached or talking. Its comic bubble reveals dialogue a letter at a time. Press E/A or click the bubble to show the full line, then again to close it; Escape/B also closes it. Reduced motion shows the complete line immediately.
 
+Each run starts with the rocket landing and the Buddy walking out. Controls unlock after the arrival. Returning to the rocket plays boarding, an engine shake, and takeoff; the Meep reacts before the scene fades back to the launcher. Reduced motion shortens the staging and removes shaking and jumping.
+
 ## Verify
 
 ```sh
