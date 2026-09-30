@@ -4,14 +4,12 @@ signal mode_completed(result: ModeResult)
 
 const WALK_SPEED := 245.0
 const INTERACTION_RANGE := 92.0
-const SCAN_DURATION := 0.55
 
 @onready var world: Node2D = $World
 
 var mode_context: ModeContext
 var _cheese_collected := false
 var _discovery_found := false
-var _scan_time := 0.0
 var _message_time := 0.0
 
 
@@ -53,10 +51,6 @@ func _physics_process(delta: float) -> void:
 		world.buddy_position = next_position
 		world.queue_redraw()
 	world.update_walk_animation(previous_position.distance_to(world.buddy_position), delta, SaveService.is_reduced_motion())
-	if _scan_time > 0.0:
-		_scan_time = maxf(0.0, _scan_time - delta)
-		world.scan_radius = (SCAN_DURATION - _scan_time) / SCAN_DURATION * 300.0 if _scan_time > 0.0 else 0.0
-		world.queue_redraw()
 	if _message_time > 0.0:
 		_message_time -= delta
 		if _message_time <= 0.0:
@@ -105,9 +99,7 @@ func _update_prompt() -> void:
 
 
 func _scan() -> void:
-	_scan_time = SCAN_DURATION
-	world.scan_radius = 1.0
-	world.queue_redraw()
+	world.play_scan()
 	var clues: Array[String] = []
 	if not _cheese_collected:
 		clues.append("Cheese signal %s" % _direction_to(world.CHEESE))
@@ -190,14 +182,13 @@ func _emit_result(result: ModeResult) -> void:
 func _restart() -> void:
 	_cheese_collected = false
 	_discovery_found = false
-	_scan_time = 0.0
 	_message_time = 0.0
 	world.buddy_position = Vector2(270, 405)
 	world.reset_walk_animation()
 	world.reset_pickup_effect()
 	world.cheese_collected = false
 	world.discovery_found = false
-	world.scan_radius = 0.0
+	world.reset_scan_effect()
 	world.queue_redraw()
 	%FeedbackLabel.text = "Scan to find something interesting."
 	_update_hud()

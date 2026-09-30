@@ -12,15 +12,30 @@ const DISCOVERY := Vector2(1000, 265)
 const WALK_BOUNCE_HEIGHT := 5.0
 const WALK_BOUNCE_DISTANCE := 100.0
 const PICKUP_DURATION := 0.9
+const SCAN_RANGE := 300.0
+const SCAN_WAVE_DURATION := 0.75
+const SCAN_EFFECT_DURATION := 1.8
 
 var buddy_position := Vector2(270, 405)
 var buddy_facing := Vector2.RIGHT
 var cheese_collected := false
 var discovery_found := false
-var scan_radius := 0.0
+var _scan_time := 0.0
+var _scan_origin := Vector2.ZERO
 var _walk_distance := 0.0
 var _walk_lift := 0.0
 var _pickup_time := 0.0
+
+
+func play_scan() -> void:
+	_scan_origin = buddy_position
+	_scan_time = SCAN_EFFECT_DURATION
+	queue_redraw()
+
+
+func reset_scan_effect() -> void:
+	_scan_time = 0.0
+	queue_redraw()
 
 
 func play_cheese_pickup() -> void:
@@ -34,6 +49,9 @@ func reset_pickup_effect() -> void:
 
 
 func _process(delta: float) -> void:
+	if _scan_time > 0.0:
+		_scan_time = maxf(0.0, _scan_time - delta)
+		queue_redraw()
 	if _pickup_time > 0.0:
 		_pickup_time = maxf(0.0, _pickup_time - delta)
 		queue_redraw()
@@ -71,18 +89,42 @@ func _draw() -> void:
 		draw_circle(DISCOVERY + Vector2(49, -37), 13.0, Color("73c6c7"))
 		draw_line(DISCOVERY + Vector2(43, -37), DISCOVERY + Vector2(48, -31), Color("26394f"), 3.0)
 		draw_line(DISCOVERY + Vector2(48, -31), DISCOVERY + Vector2(56, -43), Color("26394f"), 3.0)
-	if scan_radius > 0.0:
-		draw_arc(buddy_position, scan_radius, 0.0, TAU, 64, Color("73c6c7", 0.85), 5.0)
-		if not cheese_collected and buddy_position.distance_to(CHEESE) <= 300.0:
-			draw_arc(CHEESE, 46.0, 0.0, TAU, 32, Color("73c6c7"), 4.0)
-		if not discovery_found and buddy_position.distance_to(DISCOVERY) <= 300.0:
-			draw_arc(DISCOVERY, 66.0, 0.0, TAU, 32, Color("73c6c7"), 4.0)
+	if _scan_time > 0.0:
+		_draw_scan_effect()
 	_draw_oval_shadow(buddy_position + Vector2(0, 22), Vector2(28 - _walk_lift * 0.5, 8), Color("9ebcc1"))
 	draw_set_transform(buddy_position + Vector2(0, -24 - _walk_lift), 0.0, Vector2(-1.0 if buddy_facing.x < -0.15 else 1.0, 1.0))
 	draw_texture_rect(BUDDY, Rect2(-48, -56, 96, 112), false)
 	draw_set_transform(Vector2.ZERO)
 	if _pickup_time > 0.0:
 		_draw_pickup_effect()
+
+
+func _draw_scan_effect() -> void:
+	var elapsed := SCAN_EFFECT_DURATION - _scan_time
+	var reduced_motion := SaveService.is_reduced_motion()
+	var reached_radius := SCAN_RANGE if reduced_motion else minf(elapsed / SCAN_WAVE_DURATION, 1.0) * SCAN_RANGE
+	var highlight_alpha := minf(_scan_time / 0.4, 1.0)
+	if reduced_motion:
+		if elapsed < SCAN_WAVE_DURATION:
+			draw_arc(_scan_origin, 45.0, 0.0, TAU, 64, Color("73c6c7", 0.6), 3.0, true)
+	else:
+		for wave in range(2):
+			var progress := (elapsed - float(wave) * 0.16) / SCAN_WAVE_DURATION
+			if progress >= 0.0 and progress < 1.0:
+				var radius := 24.0 + progress * (SCAN_RANGE - 24.0)
+				draw_arc(_scan_origin, radius, 0.0, TAU, 96, Color("73c6c7", (1.0 - progress) * 0.75), 4.0 if wave == 0 else 2.0, true)
+	if not cheese_collected and _scan_origin.distance_to(CHEESE) <= reached_radius:
+		_draw_scan_marker(CHEESE, 48.0, highlight_alpha)
+	if not discovery_found and _scan_origin.distance_to(DISCOVERY) <= reached_radius:
+		_draw_scan_marker(DISCOVERY, 68.0, highlight_alpha)
+
+
+func _draw_scan_marker(center: Vector2, radius: float, alpha: float) -> void:
+	# Four corners frame a found clue without hiding its silhouette.
+	for corner in range(4):
+		var angle := float(corner) * PI * 0.5 + PI * 0.25
+		draw_arc(center, radius, angle - 0.16, angle + 0.16, 8, Color("26394f", alpha), 7.0, true)
+		draw_arc(center, radius, angle - 0.16, angle + 0.16, 8, Color("73c6c7", alpha), 3.0, true)
 
 
 func _draw_pickup_effect() -> void:
