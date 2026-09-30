@@ -12,9 +12,9 @@ func _ready() -> void:
 func present(context: Dictionary) -> void:
 	var result: ModeResult = context.get("last_result") as ModeResult
 	if result != null:
-		%LastRunLabel.text = "Last run: %s  |  Cheese: %d  |  Discovery: %s" % [
+		%LastRunLabel.text = "%s  |  Cheese: %d  |  Discovery: %s  |  Meeps: %d" % [
 			result.status, int(result.rewards.get("moon_cheese", 0)),
-			"yes" if not result.discoveries.is_empty() else "no"
+			"yes" if not result.discoveries.is_empty() else "no", result.rescued_meeps.size()
 		]
 
 

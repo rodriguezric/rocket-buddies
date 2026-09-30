@@ -6,7 +6,9 @@ A whimsical 2D space adventure under development in **Godot 4.6 stable** (`4.6.s
 
 Open `project.godot` in Godot 4.6 and press F6 on `modes/exploration/MoonExploration.tscn` to run the mode directly, or press F5 and choose **Play Demos → Explore the Moon**. The opening can be skipped.
 
-On the Moon, move with WASD, arrow keys, or the left stick. Scan with Q or controller X, interact with E, Space, or controller A, restart with R or controller Y, and exit with Escape or controller B. Collect Moon Cheese, inspect the crater, then return to the rocket. Returning early produces an incomplete result without penalty.
+On the Moon, move with WASD, arrow keys, or the left stick. Scan with Q or controller X, interact with E, Space, or controller A, restart with R or controller Y, and exit with Escape or controller B. Collect Moon Cheese, inspect the crater, offer the cheese to the hungry Meep on the right, then return to the rocket. Feeding the Meep consumes one cheese and adds the rescue to the demo result. Returning early produces an incomplete result without penalty.
+
+The Meep occasionally strolls around its area and stops when approached or talking. Its comic bubble reveals dialogue a letter at a time. Press E/A or click the bubble to show the full line, then again to close it; Escape/B also closes it. Reduced motion shows the complete line immediately.
 
 ## Verify
 
