@@ -5,6 +5,7 @@ const SCREEN_REGISTRY := {
     "title": preload("res://scenes/title/TitleScreen.tscn"),
     "play": preload("res://game/PlayScreen.tscn"),
     "moon_exploration": preload("res://modes/exploration/MoonExploration.tscn"),
+    "rocket_flight": preload("res://modes/flight/RocketFlight.tscn"),
     "settings": preload("res://scenes/settings/SettingsScreen.tscn"),
     "records": preload("res://scenes/records/RecordsScreen.tscn"),
     "achievements": preload("res://scenes/achievements/AchievementsScreen.tscn"),

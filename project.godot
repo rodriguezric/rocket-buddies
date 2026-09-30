@@ -68,3 +68,7 @@ restart_demo={
 "deadzone": 0.5,
 "events": [Object(InputEventKey,"physical_keycode":82), Object(InputEventJoypadButton,"button_index":3)]
 }
+boost={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"physical_keycode":4194325), Object(InputEventJoypadButton,"button_index":5)]
+}

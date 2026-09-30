@@ -7,15 +7,21 @@ signal navigation_requested(screen_name: String, context: Dictionary, remember: 
 func _ready() -> void:
 	%BackButton.pressed.connect(func() -> void: back_requested.emit())
 	%LaunchButton.pressed.connect(_launch_moon)
+	%FlightButton.pressed.connect(_launch_flight)
 
 
 func present(context: Dictionary) -> void:
 	var result: ModeResult = context.get("last_result") as ModeResult
 	if result != null:
-		%LastRunLabel.text = "%s  |  Cheese: %d  |  Discovery: %s  |  Meeps: %d" % [
-			result.status, int(result.rewards.get("moon_cheese", 0)),
-			"yes" if not result.discoveries.is_empty() else "no", result.rescued_meeps.size()
-		]
+		if result.metadata.get("mode_id") == &"flight":
+			%LastRunLabel.text = "%s flight  |  Stardust: %d  |  Cheese: %d  |  Fuel: %d" % [
+				result.status, int(result.rewards.get("stardust", 0)), int(result.rewards.get("moon_cheese", 0)), int(result.metadata.get("fuel_remaining", 0))
+			]
+		else:
+			%LastRunLabel.text = "%s  |  Cheese: %d  |  Discovery: %s  |  Meeps: %d" % [
+				result.status, int(result.rewards.get("moon_cheese", 0)),
+				"yes" if not result.discoveries.is_empty() else "no", result.rescued_meeps.size()
+			]
 
 
 func _launch_moon() -> void:
@@ -23,6 +29,13 @@ func _launch_moon() -> void:
 	context.mode_id = &"exploration"
 	context.destination_id = &"moon"
 	navigation_requested.emit("moon_exploration", {"mode_context": context}, true)
+
+
+func _launch_flight() -> void:
+	var context := ModeContext.new()
+	context.mode_id = &"flight"
+	context.destination_id = &"moon"
+	navigation_requested.emit("rocket_flight", {"mode_context": context}, true)
 
 
 func _unhandled_input(event: InputEvent) -> void:
