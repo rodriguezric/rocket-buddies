@@ -16,20 +16,52 @@ func _run() -> void:
 	mode.present({"mode_context": context})
 	var results: Array[ModeResult] = []
 	mode.mode_completed.connect(func(result: ModeResult) -> void: results.append(result))
+	mode.world._meep_wait = 0.0
+	mode.world._update_meep_walk(0.1)
+	mode.world._update_meep_walk(0.5)
+	if mode.world.meep_position == mode.world.MEEP:
+		_fail("Meep did not begin its occasional walk")
+		return
+	mode.world.buddy_position = mode.world.meep_position
+	mode._interact()
+	var talking_position: Vector2 = mode.world.meep_position
+	mode.world._update_meep_walk(2.0)
+	if not mode.world.is_meep_talking() or mode.world.meep_position != talking_position:
+		_fail("Meep moved while talking or did not show speech")
+		return
+	mode.world.advance_meep_dialogue()
+	if mode.world._speech.is_revealing():
+		_fail("Advance did not reveal the complete speech line")
+		return
+	mode.world.close_meep_dialogue()
+	if mode.world.meep_rescued or not mode._make_result(&"incomplete").rescued_meeps.is_empty():
+		_fail("Hungry Meep was rescued without cheese")
+		return
 	mode.world.buddy_position = mode.world.CHEESE
 	mode._interact()
 	mode.world.buddy_position = mode.world.DISCOVERY
 	mode._interact()
+	mode.world.buddy_position = mode.world.meep_position
+	mode._interact()
+	if not mode.world._speech.get_node("Panel/Column/Dialogue").text.contains("Thank you"):
+		_fail("Fed Meep did not thank the Buddy")
+		return
+	mode.world.close_meep_dialogue()
+	mode._interact()
+	if not mode.world._speech.get_node("Panel/Column/Dialogue").text.contains("home"):
+		_fail("Already-fed Meep did not use friendship dialogue")
+		return
+	mode.world.close_meep_dialogue()
 	mode.world.buddy_position = mode.world.ROCKET
 	mode._interact()
 	if results.size() != 1 or results[0].status != &"completed":
 		_fail("Completed exploration did not emit one completed result")
 		return
-	if int(results[0].rewards.get("moon_cheese", 0)) != 1 or results[0].discoveries != [&"moon_impact_craters"]:
-		_fail("Result did not contain the cheese and discovery")
+	if int(results[0].rewards.get("moon_cheese", 0)) != 0 or results[0].discoveries != [&"moon_impact_craters"] or results[0].rescued_meeps != [&"moon_first_meep"]:
+		_fail("Result did not consume cheese and record one discovery and one rescue")
 		return
 	mode._restart()
-	if mode.world.cheese_collected or mode.world.discovery_found or mode.world.buddy_position != Vector2(270, 405):
+	if mode.world.cheese_collected or mode.world.discovery_found or mode.world.meep_rescued or mode.world.is_meep_talking() or mode.world.meep_position != mode.world.MEEP or mode.world.buddy_position != Vector2(270, 405):
 		_fail("Restart did not reset the demo")
 		return
 	mode.queue_free()
@@ -52,6 +84,9 @@ func _run() -> void:
 	integrated_mode._interact()
 	integrated_mode.world.buddy_position = integrated_mode.world.DISCOVERY
 	integrated_mode._interact()
+	integrated_mode.world.buddy_position = integrated_mode.world.meep_position
+	integrated_mode._interact()
+	integrated_mode.world.close_meep_dialogue()
 	integrated_mode.world.buddy_position = integrated_mode.world.ROCKET
 	integrated_mode._interact()
 	await create_timer(0.5).timeout

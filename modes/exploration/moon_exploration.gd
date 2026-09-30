@@ -9,6 +9,8 @@ const INTERACTION_RANGE := 92.0
 
 var mode_context: ModeContext
 var _cheese_collected := false
+var _cheese_available := false
+var _meep_rescued := false
 var _discovery_found := false
 var _message_time := 0.0
 var _discovery_tween: Tween
@@ -68,7 +70,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("restart_demo"):
 		_restart()
 	elif event.is_action_pressed("ui_cancel"):
-		if %DiscoveryCard.visible:
+		if world.is_meep_talking():
+			world.close_meep_dialogue()
+		elif %DiscoveryCard.visible:
 			_hide_discovery_card()
 		else:
 			_exit_demo()
@@ -84,6 +88,7 @@ func _nearest_target() -> String:
 		"rocket": world.ROCKET,
 		"cheese": world.CHEESE,
 		"crater": world.DISCOVERY,
+		"meep": world.meep_position,
 	}
 	for key in targets:
 		if key == "cheese" and _cheese_collected:
@@ -96,10 +101,15 @@ func _nearest_target() -> String:
 
 
 func _update_prompt() -> void:
+	if world.is_meep_talking():
+		%PromptLabel.text = "E / A  •  Continue talking     ESC / B  •  Close"
+		return
 	match _nearest_target():
 		"rocket": %PromptLabel.text = "E / A  •  Return to rocket"
 		"cheese": %PromptLabel.text = "E / A  •  Collect Moon Cheese"
 		"crater": %PromptLabel.text = "E / A  •  Inspect crater"
+		"meep":
+			%PromptLabel.text = "E / A  •  Say hello to your Meep friend" if _meep_rescued else ("E / A  •  Offer Moon Cheese" if _cheese_available else "E / A  •  Meet the hungry Meep")
 		_: %PromptLabel.text = "Q / X  •  Scan for clues"
 
 
@@ -110,6 +120,8 @@ func _scan() -> void:
 		clues.append("Cheese signal %s" % _direction_to(world.CHEESE))
 	if not _discovery_found:
 		clues.append("Interesting crater %s" % _direction_to(world.DISCOVERY))
+	if not _meep_rescued:
+		clues.append("Meep signal %s" % _direction_to(world.meep_position))
 	if clues.is_empty():
 		_show_message("Everything found! Head back to the rocket.")
 	else:
@@ -124,9 +136,13 @@ func _direction_to(target: Vector2) -> String:
 
 
 func _interact() -> void:
+	if world.is_meep_talking():
+		world.advance_meep_dialogue()
+		return
 	match _nearest_target():
 		"cheese":
 			_cheese_collected = true
+			_cheese_available = true
 			world.cheese_collected = true
 			world.play_cheese_pickup()
 			_show_message("Moon Cheese collected! It smells mysteriously delicious.", 4.0)
@@ -138,15 +154,30 @@ func _interact() -> void:
 			_show_message("Moon craters discovered! Inspect the crater again to read the card.", 5.0)
 		"rocket":
 			_finish()
+		"meep":
+			_hide_discovery_card()
+			if _meep_rescued:
+				world.say_meep("Meep! My tummy is happy. Can I come home with you?")
+				_show_message("MEEP! Your new friend is ready to go home with you.", 4.0)
+			elif _cheese_available:
+				_cheese_available = false
+				_meep_rescued = true
+				world.rescue_meep()
+				world.say_meep("MEEP! Cheese! Thank you, Buddy. You are my new friend!")
+				_show_message("You shared your cheese! The happy Meep will come home with you.", 6.0)
+			else:
+				world.say_meep("Meep... my tummy is rumbling. Could you find me some cheese?")
+				_show_message("This Meep is hungry! Find Moon Cheese, then bring it back.", 5.0)
 		_:
 			_show_message("Move closer to something interesting, or scan for clues.")
 	_update_hud()
 
 
 func _update_hud() -> void:
-	%ObjectiveLabel.text = "%s MOON CHEESE     %s CRATER" % [
+	%ObjectiveLabel.text = "%s CHEESE   %s CRATER   %s MEEP" % [
 		"[✓]" if _cheese_collected else "[ ]",
-		"[✓]" if _discovery_found else "[ ]"
+		"[✓]" if _discovery_found else "[ ]",
+		"[✓]" if _meep_rescued else "[ ]"
 	]
 
 
@@ -179,7 +210,11 @@ func _hide_discovery_card() -> void:
 func _make_result(status: StringName) -> ModeResult:
 	var result := ModeResult.new()
 	result.status = status
-	result.rewards = {"moon_cheese": 1 if _cheese_collected else 0}
+	result.rewards = {"moon_cheese": 1 if _cheese_available else 0}
+	if _meep_rescued:
+		result.rescued_meeps.append(&"moon_first_meep")
+		result.objective_events.append({"type": &"meep_rescued", "id": &"moon_first_meep"})
+		result.objective_events.append({"type": &"item_used", "id": &"moon_cheese", "amount": 1})
 	if _cheese_collected:
 		result.objective_events.append({"type": &"item_collected", "id": &"moon_cheese", "amount": 1})
 	if _discovery_found:
@@ -190,7 +225,7 @@ func _make_result(status: StringName) -> ModeResult:
 
 
 func _finish() -> void:
-	var status: StringName = &"completed" if _cheese_collected and _discovery_found else &"incomplete"
+	var status: StringName = &"completed" if _cheese_collected and _discovery_found and _meep_rescued else &"incomplete"
 	_emit_result(_make_result(status))
 
 
@@ -209,11 +244,14 @@ func _emit_result(result: ModeResult) -> void:
 func _restart() -> void:
 	_hide_discovery_card()
 	_cheese_collected = false
+	_cheese_available = false
+	_meep_rescued = false
 	_discovery_found = false
 	_message_time = 0.0
 	world.buddy_position = Vector2(270, 405)
 	world.reset_walk_animation()
 	world.reset_pickup_effect()
+	world.reset_meep()
 	world.cheese_collected = false
 	world.discovery_found = false
 	world.reset_scan_effect()
