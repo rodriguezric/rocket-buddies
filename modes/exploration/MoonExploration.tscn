@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://modes/exploration/moon_exploration.gd" id="1"]
 [ext_resource type="Script" path="res://modes/exploration/moon_world.gd" id="2"]
 [ext_resource type="Theme" path="res://ui/theme/base_theme.tres" id="3"]
+[ext_resource type="Texture2D" path="res://assets/art/moon/crater.svg" id="4"]
 
 [node name="MoonExploration" type="Control"]
 layout_mode = 3
@@ -100,3 +101,58 @@ text = "RESTART  R / Y"
 unique_name_in_owner = true
 layout_mode = 2
 text = "DEMO MENU  ESC / B"
+
+[node name="DiscoveryCard" type="PanelContainer" parent="HUD"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -422.0
+offset_top = 18.0
+offset_right = -22.0
+offset_bottom = 225.0
+grow_horizontal = 0
+
+[node name="Content" type="VBoxContainer" parent="HUD/DiscoveryCard"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Header" type="HBoxContainer" parent="HUD/DiscoveryCard/Content"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Illustration" type="TextureRect" parent="HUD/DiscoveryCard/Content/Header"]
+custom_minimum_size = Vector2(78, 60)
+layout_mode = 2
+texture = ExtResource("4")
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+
+[node name="Titles" type="VBoxContainer" parent="HUD/DiscoveryCard/Content/Header"]
+layout_mode = 2
+alignment = 1
+
+[node name="Badge" type="Label" parent="HUD/DiscoveryCard/Content/Header/Titles"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.451, 0.776, 0.78, 1)
+text = "SPACE DISCOVERY"
+
+[node name="Title" type="Label" parent="HUD/DiscoveryCard/Content/Header/Titles"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.976, 0.796, 0.396, 1)
+text = "Moon craters"
+
+[node name="Fact" type="Label" parent="HUD/DiscoveryCard/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Most lunar craters formed when space rocks hit the Moon."
+autowrap_mode = 2
+
+[node name="DiscoveryCloseButton" type="Button" parent="HUD/DiscoveryCard/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "GOT IT!  ESC / B"

@@ -11,11 +11,13 @@ var mode_context: ModeContext
 var _cheese_collected := false
 var _discovery_found := false
 var _message_time := 0.0
+var _discovery_tween: Tween
 
 
 func _ready() -> void:
 	%RestartButton.pressed.connect(_restart)
 	%ExitButton.pressed.connect(_exit_demo)
+	%DiscoveryCloseButton.pressed.connect(_hide_discovery_card)
 	resized.connect(_resize_world)
 	_resize_world()
 	if mode_context == null:
@@ -66,7 +68,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("restart_demo"):
 		_restart()
 	elif event.is_action_pressed("ui_cancel"):
-		_exit_demo()
+		if %DiscoveryCard.visible:
+			_hide_discovery_card()
+		else:
+			_exit_demo()
 	else:
 		return
 	get_viewport().set_input_as_handled()
@@ -129,7 +134,8 @@ func _interact() -> void:
 			_discovery_found = true
 			world.discovery_found = true
 			world.queue_redraw()
-			_show_message("Discovery: Most lunar craters formed when space rocks hit the Moon.", 7.0)
+			_show_discovery_card()
+			_show_message("Moon craters discovered! Inspect the crater again to read the card.", 5.0)
 		"rocket":
 			_finish()
 		_:
@@ -147,6 +153,27 @@ func _update_hud() -> void:
 func _show_message(message: String, seconds := 3.0) -> void:
 	%FeedbackLabel.text = message
 	_message_time = seconds
+
+
+func _show_discovery_card() -> void:
+	if _discovery_tween != null:
+		_discovery_tween.kill()
+	%DiscoveryCard.show()
+	%DiscoveryCard.modulate.a = 1.0
+	if not SaveService.is_reduced_motion():
+		%DiscoveryCard.modulate.a = 0.0
+		_discovery_tween = create_tween()
+		_discovery_tween.tween_property(%DiscoveryCard, "modulate:a", 1.0, 0.2)
+
+
+func _hide_discovery_card() -> void:
+	if _discovery_tween != null:
+		_discovery_tween.kill()
+		_discovery_tween = null
+	%DiscoveryCard.hide()
+	%DiscoveryCard.modulate.a = 1.0
+	if %DiscoveryCloseButton.has_focus():
+		%DiscoveryCloseButton.release_focus()
 
 
 func _make_result(status: StringName) -> ModeResult:
@@ -180,6 +207,7 @@ func _emit_result(result: ModeResult) -> void:
 
 
 func _restart() -> void:
+	_hide_discovery_card()
 	_cheese_collected = false
 	_discovery_found = false
 	_message_time = 0.0
