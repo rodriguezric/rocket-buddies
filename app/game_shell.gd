@@ -7,6 +7,7 @@ const SCREEN_REGISTRY := {
     "moon_exploration": preload("res://modes/exploration/MoonExploration.tscn"),
     "rocket_flight": preload("res://modes/flight/RocketFlight.tscn"),
     "moon_cheese_hunt": preload("res://modes/cheese_hunt/MoonCheeseHunt.tscn"),
+    "meep_rescue": preload("res://modes/meep_rescue/MeepRescue.tscn"),
     "settings": preload("res://scenes/settings/SettingsScreen.tscn"),
     "records": preload("res://scenes/records/RecordsScreen.tscn"),
     "achievements": preload("res://scenes/achievements/AchievementsScreen.tscn"),

@@ -1,0 +1,130 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://modes/meep_rescue/meep_rescue.gd" id="1"]
+[ext_resource type="Script" path="res://modes/meep_rescue/rescue_world.gd" id="2"]
+[ext_resource type="Theme" path="res://ui/theme/base_theme.tres" id="3"]
+
+[node name="MeepRescue" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("3")
+script = ExtResource("1")
+
+[node name="World" type="Node2D" parent="."]
+script = ExtResource("2")
+
+[node name="HUD" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="StatusPanel" type="PanelContainer" parent="HUD"]
+layout_mode = 1
+offset_left = 22.0
+offset_top = 18.0
+offset_right = 786.0
+offset_bottom = 153.0
+mouse_filter = 2
+
+[node name="StatusColumn" type="VBoxContainer" parent="HUD/StatusPanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Title" type="Label" parent="HUD/StatusPanel/StatusColumn"]
+layout_mode = 2
+theme_type_variation = &"H1"
+theme_override_font_sizes/font_size = 28
+text = "MEEP RESCUE"
+
+[node name="ObjectiveLabel" type="Label" parent="HUD/StatusPanel/StatusColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.976, 0.796, 0.396, 1)
+theme_override_font_sizes/font_size = 18
+text = "[ ] PATH   [ ] CHEESE   [ ] MEEP   [ ] RETURN"
+
+[node name="Hint" type="Label" parent="HUD/StatusPanel/StatusColumn"]
+layout_mode = 2
+theme_type_variation = &"Muted"
+text = "Follow the signal. Scan to find the loose rock."
+
+[node name="SupplyPanel" type="PanelContainer" parent="HUD"]
+layout_mode = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -255.0
+offset_top = 18.0
+offset_right = -22.0
+offset_bottom = 103.0
+grow_horizontal = 0
+mouse_filter = 2
+
+[node name="CheeseLabel" type="Label" parent="HUD/SupplyPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.976, 0.796, 0.396, 1)
+theme_override_font_sizes/font_size = 18
+text = "MOON CHEESE  0"
+
+[node name="MessagePanel" type="PanelContainer" parent="HUD"]
+layout_mode = 1
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 22.0
+offset_top = -154.0
+offset_right = -22.0
+offset_bottom = -18.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="MessageColumn" type="VBoxContainer" parent="HUD/MessagePanel"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="PromptLabel" type="Label" parent="HUD/MessagePanel/MessageColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.976, 0.796, 0.396, 1)
+theme_override_font_sizes/font_size = 22
+text = "LANDING NEAR THE MEEP SIGNAL..."
+
+[node name="FeedbackLabel" type="Label" parent="HUD/MessagePanel/MessageColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "A faint MEEP is coming from beyond the rocks."
+
+[node name="Footer" type="HBoxContainer" parent="HUD/MessagePanel/MessageColumn"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="RestartButton" type="Button" parent="HUD/MessagePanel/MessageColumn/Footer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "RESTART  R / Y"
+
+[node name="ExitButton" type="Button" parent="HUD/MessagePanel/MessageColumn/Footer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "DEMO MENU  ESC / B"
+
+[node name="Fade" type="ColorRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.094, 0.169, 0.267, 0)

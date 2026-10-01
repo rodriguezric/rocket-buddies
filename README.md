@@ -1,6 +1,6 @@
 # Rocket Buddies
 
-A whimsical 2D space adventure under development in **Godot 4.6 stable** (`4.6.stable.official.89cea1439`). The standalone demos are Moon exploration, Rocket Flight, and Moon Cheese Hunt.
+A whimsical 2D space adventure under development in **Godot 4.6 stable** (`4.6.stable.official.89cea1439`). The standalone demos are Moon exploration, Rocket Flight, Moon Cheese Hunt, and Meep Rescue.
 
 ## Run
 
@@ -14,6 +14,8 @@ In Rocket Flight, steer with WASD, arrow keys, or the left stick. Hold Shift or 
 
 In Moon Cheese Hunt, move the highlighted patch with WASD, arrow keys, or the left stick. Scan with Q or controller X, read the heat and direction clue, then dig with E, Space, or controller A. You can also click a patch to select it and click again to dig. Scanner charges refill; all buried cheese can be found without a time limit. The mode returns collected cheese and scan/dig counts.
 
+In Meep Rescue, move with WASD, arrow keys, or the left stick. Scan with Q or controller X to reveal the loose boulder, then use E, Space, or controller A near that rock to open a path. Pick up Moon Cheese, share it with the trapped Meep, and return to the rocket together. The Meep speaks in a comic bubble and follows Buddy after the rescue. The mode also accepts starting Moon Cheese through `ModeContext.parameters["moon_cheese"]` for future mission integration.
+
 Each run starts with the rocket landing and the Buddy walking out. Controls unlock after the arrival. Returning to the rocket plays boarding, an engine shake, and takeoff; the Meep reacts before the scene fades back to the launcher. Reduced motion shortens the staging and removes shaking and jumping.
 
 ## Verify
@@ -23,6 +25,7 @@ godot --headless --path . --editor --quit
 godot --headless --path . --script res://tests/test_moon_exploration.gd
 godot --headless --path . --script res://tests/test_rocket_flight.gd
 godot --headless --path . --script res://tests/test_moon_cheese_hunt.gd
+godot --headless --path . --script res://tests/test_meep_rescue.gd
 ```
 
 ## Project conventions
