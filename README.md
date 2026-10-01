@@ -1,16 +1,18 @@
 # Rocket Buddies
 
-A whimsical 2D space adventure under development in **Godot 4.6 stable** (`4.6.stable.official.89cea1439`). The first two standalone demos are Moon exploration and Rocket Flight.
+A whimsical 2D space adventure under development in **Godot 4.6 stable** (`4.6.stable.official.89cea1439`). The standalone demos are Moon exploration, Rocket Flight, and Moon Cheese Hunt.
 
 ## Run
 
-Open `project.godot` in Godot 4.6 and press F5, then choose **Play Demos → Explore the Moon** or **Fly to the Moon**. The opening can be skipped. Each mode can also run directly with F6 on its scene under `modes/`.
+Open `project.godot` in Godot 4.6 and press F5, then choose **Play Demos** and select a mode. The opening can be skipped. Each mode can also run directly with F6 on its scene under `modes/`.
 
 On the Moon, move with WASD, arrow keys, or the left stick. Scan with Q or controller X, interact with E, Space, or controller A, restart with R or controller Y, and exit with Escape or controller B. Collect Moon Cheese, inspect the crater, offer the cheese to the hungry Meep on the right, then return to the rocket. Feeding the Meep consumes one cheese and adds the rescue to the demo result. Returning early produces an incomplete result without penalty.
 
 The Meep occasionally strolls around its area and stops when approached or talking. Its comic bubble reveals dialogue a letter at a time. Press E/A or click the bubble to show the full line, then again to close it; Escape/B also closes it. Reduced motion shows the complete line immediately.
 
 In Rocket Flight, steer with WASD, arrow keys, or the left stick. Hold Shift or controller RB to boost, spending fuel for faster travel. Collect stardust, fuel canisters, and the optional Moon Cheese comet; avoid asteroids and reach the Moon. Bumps cost fuel but never strand the rocket. Press R/Y to restart or Escape/B to return to the demo menu.
+
+In Moon Cheese Hunt, move the highlighted patch with WASD, arrow keys, or the left stick. Scan with Q or controller X, read the heat and direction clue, then dig with E, Space, or controller A. You can also click a patch to select it and click again to dig. Scanner charges refill; all buried cheese can be found without a time limit. The mode returns collected cheese and scan/dig counts.
 
 Each run starts with the rocket landing and the Buddy walking out. Controls unlock after the arrival. Returning to the rocket plays boarding, an engine shake, and takeoff; the Meep reacts before the scene fades back to the launcher. Reduced motion shortens the staging and removes shaking and jumping.
 
@@ -20,6 +22,7 @@ Each run starts with the rocket landing and the Buddy walking out. Controls unlo
 godot --headless --path . --editor --quit
 godot --headless --path . --script res://tests/test_moon_exploration.gd
 godot --headless --path . --script res://tests/test_rocket_flight.gd
+godot --headless --path . --script res://tests/test_moon_cheese_hunt.gd
 ```
 
 ## Project conventions

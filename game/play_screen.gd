@@ -8,12 +8,17 @@ func _ready() -> void:
 	%BackButton.pressed.connect(func() -> void: back_requested.emit())
 	%LaunchButton.pressed.connect(_launch_moon)
 	%FlightButton.pressed.connect(_launch_flight)
+	%HuntButton.pressed.connect(_launch_hunt)
 
 
 func present(context: Dictionary) -> void:
 	var result: ModeResult = context.get("last_result") as ModeResult
 	if result != null:
-		if result.metadata.get("mode_id") == &"flight":
+		if result.metadata.get("mode_id") == &"cheese_hunt":
+			%LastRunLabel.text = "%s hunt  |  Cheese: %d  |  Scans: %d  |  Digs: %d" % [
+				result.status, int(result.rewards.get("moon_cheese", 0)), int(result.metadata.get("scans_used", 0)), int(result.metadata.get("digs_used", 0))
+			]
+		elif result.metadata.get("mode_id") == &"flight":
 			%LastRunLabel.text = "%s flight  |  Stardust: %d  |  Cheese: %d  |  Fuel: %d" % [
 				result.status, int(result.rewards.get("stardust", 0)), int(result.rewards.get("moon_cheese", 0)), int(result.metadata.get("fuel_remaining", 0))
 			]
@@ -36,6 +41,13 @@ func _launch_flight() -> void:
 	context.mode_id = &"flight"
 	context.destination_id = &"moon"
 	navigation_requested.emit("rocket_flight", {"mode_context": context}, true)
+
+
+func _launch_hunt() -> void:
+	var context := ModeContext.new()
+	context.mode_id = &"cheese_hunt"
+	context.destination_id = &"moon"
+	navigation_requested.emit("moon_cheese_hunt", {"mode_context": context}, true)
 
 
 func _unhandled_input(event: InputEvent) -> void:

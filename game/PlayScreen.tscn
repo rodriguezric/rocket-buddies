@@ -74,6 +74,11 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Fly to the Moon"
 
+[node name="HuntButton" type="Button" parent="Center/Panel/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Hunt for Moon Cheese"
+
 [node name="LastRunLabel" type="Label" parent="Center/Panel/Content"]
 unique_name_in_owner = true
 layout_mode = 2
